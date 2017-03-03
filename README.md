@@ -47,6 +47,12 @@ via environment variables as well
 When both are specified, commandline parameters take
 precedence over environment variables.
 
+Either `amqp-queue` or `amqp-exchange` and `amqp-binding-key` may be specified.
+In case `amqp-queue` is used all messages to the given queue are forwarded.
+In case `amqp-exchange` and `amqp-binding-key` are specified a temporary queue
+is declared and bound to the exchange using the binding key to select messages
+forwarded.
+
 
 ## Docker
 
