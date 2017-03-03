@@ -56,8 +56,9 @@ forwarded.
 
 ## Docker
 
-A docker-ized variant is available `meteogroup/amqp-to-kafka`. Metrics are
-exposed on port `8080`. To run use
+A docker-ized variant is available 
+[`meteogroup/amqp-to-kafka`](https://hub.docker.com/r/meteogroup/amqp-to-kafka/).
+Metrics are exposed on port `8080`. To run use
 
 ```
 docker run -P meteogroup/amqp-to-kafka <additional commandline arguments>
