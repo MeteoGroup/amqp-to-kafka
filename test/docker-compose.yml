@@ -1,0 +1,27 @@
+version: '2'
+services:
+  amqp:
+    image: rabbitmq:management-alpine
+  kafka:
+    image: spotify/kafka
+  amqp-to-kafka:
+    image: meteogroup/amqp-to-kafka:${IMAGE_TAG}
+    command:
+    - /bin/amqp-to-kafka
+    environment:
+    - AMQP_URI=amqp://amqp
+    - AMQP_EXCHANGE=public
+    - AMQP_QUEUE=
+    - AMQP_BINDING_KEY=/messages
+    - AMQP_CONSUMER_TAG=my-tag
+    - KAFKA_BROKERS=kafka:9092
+    - KAFKA_TOPIC=amqp-messages
+    depends_on:
+    - amqp
+    - kafka
+  test:
+    build: .
+    depends_on:
+    - amqp
+    - kafka
+    - amqp-to-kafka
