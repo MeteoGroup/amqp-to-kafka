@@ -11,7 +11,6 @@ services:
     environment:
     - AMQP_URI=amqp://amqp
     - AMQP_EXCHANGE=public
-    - AMQP_QUEUE=
     - AMQP_BINDING_KEY=/messages
     - AMQP_CONSUMER_TAG=my-tag
     - KAFKA_BROKERS=kafka:9092

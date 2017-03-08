@@ -93,7 +93,7 @@ func forwardToKafka(delivery amqp.Delivery, kafkaProducer Producer) (forwarded [
     messageCounter.WithLabelValues("skipped").Inc()
   } else {
     forwarded = append(forwarded, delivery)
-    kafkaOffsets.WithLabelValues(strconv.FormatInt(int64(partition), 10)).Set(float64(offset))
+    kafkaOffsets.WithLabelValues(kafkaTopic, strconv.FormatInt(int64(partition), 10)).Set(float64(offset))
     messageCounter.WithLabelValues("forwarded").Inc()
   }
   return
