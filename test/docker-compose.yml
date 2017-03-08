@@ -1,9 +1,8 @@
-version: '2'
+version: '2.1'
 services:
-  amqp:
-    image: rabbitmq:management-alpine
-  kafka:
-    image: spotify/kafka
+  test:
+    build: .
+    depends_on: [ amqp, kafka, amqp-to-kafka ]
   amqp-to-kafka:
     image: meteogroup/amqp-to-kafka:${IMAGE_TAG}
     command:
@@ -15,12 +14,16 @@ services:
     - AMQP_CONSUMER_TAG=my-tag
     - KAFKA_BROKERS=kafka:9092
     - KAFKA_TOPIC=amqp-messages
+    depends_on: [ init-test-stage ]
+  init-test-stage:
+    image: nasqueron/rabbitmqadmin
+    command: declare exchange name=public type=topic --host=amqp
     depends_on:
-    - amqp
-    - kafka
-  test:
-    build: .
-    depends_on:
-    - amqp
-    - kafka
-    - amqp-to-kafka
+      amqp: { condition: service_healthy }
+      kafka: { condition: service_healthy }
+  amqp:
+    image: rabbitmq:management-alpine
+    healthcheck: { test: [CMD, wget, 'http://0.0.0.0:15672'], interval: 1s, timeout: 1s, retries: 20}
+  kafka:
+    image: spotify/kafka
+    healthcheck: { test: [CMD, bash, '-c', 'printf "" >/dev/tcp/0.0.0.0/9092'], interval: 1s, timeout: 1s, retries: 20 }
