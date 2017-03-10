@@ -47,9 +47,28 @@ func removeEmpty(m map[string]string) {
 }
 
 func forwardToKafka(delivery amqp.Delivery, kafkaProducer Producer) (forwarded []amqp.Delivery, skipped []amqp.Delivery) {
-  receivedTime := time.Now()
   forwarded = []amqp.Delivery{}
   skipped = []amqp.Delivery{}
+  receivedTime := time.Now()
+  headers := mapHeaders(delivery)
+  headers["X-Received"] = receivedTime.UTC().Format(time.RFC3339)
+  headers["X-Topic"] = kafkaTopic
+  partition, offset, err := kafkaProducer.publishMessage(message.ProducerEnvelope{
+    Headers: headers,
+    Payload: sarama.ByteEncoder(delivery.Body)})
+  if (err != nil) {
+    logError(err)
+    skipped = append(skipped, delivery)
+    messageCounter.WithLabelValues("skipped").Inc()
+  } else {
+    forwarded = append(forwarded, delivery)
+    kafkaOffsets.WithLabelValues(kafkaTopic, strconv.FormatInt(int64(partition), 10)).Set(float64(offset))
+    messageCounter.WithLabelValues("forwarded").Inc()
+  }
+  return
+}
+
+func mapHeaders(delivery amqp.Delivery) (headers map[string]string) {
   deliveryMode := ""
   if (delivery.DeliveryMode == 1) {
     deliveryMode = "persistent"
@@ -57,7 +76,7 @@ func forwardToKafka(delivery amqp.Delivery, kafkaProducer Producer) (forwarded [
   if (delivery.DeliveryMode == 2) {
     deliveryMode = "non-persistent"
   }
-  headers := map[string]string{
+  headers = map[string]string{
     "AppId": delivery.AppId,
     "ContentType": delivery.ContentType,
     "ContentEncoding": delivery.ContentEncoding,
@@ -72,8 +91,7 @@ func forwardToKafka(delivery amqp.Delivery, kafkaProducer Producer) (forwarded [
     "RoutingKey": delivery.RoutingKey,
     "Type": delivery.Type,
     "UserId": delivery.UserId,
-    "X-Received": receivedTime.UTC().Format(time.RFC3339),
-    "X-Topic": kafkaTopic}
+  }
   removeEmpty(headers)
   if (delivery.DeliveryTag != 0) {
     headers["DeliveryTag"] = strconv.FormatUint(delivery.DeliveryTag, 16)
@@ -83,18 +101,6 @@ func forwardToKafka(delivery amqp.Delivery, kafkaProducer Producer) (forwarded [
   }
   if (delivery.Timestamp.UTC().Year() > 1980) {
     headers["Timestamp"] = delivery.Timestamp.UTC().Format(time.RFC3339)
-  }
-  partition, offset, err := kafkaProducer.publishMessage(message.ProducerEnvelope{
-    Headers: headers,
-    Payload: sarama.ByteEncoder(delivery.Body)})
-  if (err != nil) {
-    logError(err)
-    skipped = append(skipped, delivery)
-    messageCounter.WithLabelValues("skipped").Inc()
-  } else {
-    forwarded = append(forwarded, delivery)
-    kafkaOffsets.WithLabelValues(kafkaTopic, strconv.FormatInt(int64(partition), 10)).Set(float64(offset))
-    messageCounter.WithLabelValues("forwarded").Inc()
   }
   return
 }
