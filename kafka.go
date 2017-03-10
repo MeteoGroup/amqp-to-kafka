@@ -43,3 +43,7 @@ func (producer Producer)publishMessage(message sarama.Encoder) (partition int32,
   })
   return
 }
+
+func (producer Producer)shutdown() {
+  producer.p.Close()
+}

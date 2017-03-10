@@ -22,13 +22,27 @@ import (
   message "github.com/meteogroup/kafka-envelope/go/kafka_envelope"
   "time"
   "strconv"
+  "os"
+  "os/signal"
+  "syscall"
 )
 
 func main() {
+  shutdown_signal := make(chan os.Signal, 1)
+  signal.Notify(shutdown_signal, syscall.SIGINT, syscall.SIGTERM)
+  defer logInfo("shut down")
+
   loadConfig()
 
-  amqpConsumer := openDeliveryChannel(amqpUri, amqpExchange, amqpQueue, amqpBindingKey, amqpConsumerTag)
   kafkaProducer := createKafkaProducer()
+  defer kafkaProducer.shutdown()
+
+  amqpConsumer := openDeliveryChannel(amqpUri, amqpExchange, amqpQueue, amqpBindingKey, amqpConsumerTag)
+  go func() {
+    <-shutdown_signal
+    amqpConsumer.shutdown()
+  }()
+
   startPrometheusHttpExporter()
 
   logInfo("lift off")

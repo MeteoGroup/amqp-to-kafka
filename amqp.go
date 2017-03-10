@@ -62,7 +62,7 @@ func openDeliveryChannel(amqpURI, exchange, queueName, bindingKey, consumerTag s
   return
 }
 
-func (c Consumer) Shutdown() error {
+func (c Consumer) shutdown() error {
   // will close() the deliveries channel
   if err := c.channel.Cancel(c.tag, true); err != nil {
     return fmt.Errorf("Consumer cancel failed: %s", err)
