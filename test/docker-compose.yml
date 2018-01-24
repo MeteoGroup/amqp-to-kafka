@@ -12,9 +12,13 @@ services:
     - AMQP_EXCHANGE=public
     - AMQP_BINDING_KEY=/messages
     - AMQP_CONSUMER_TAG=my-tag
+    # predefine queue name as required by ENVCA
+    - AMQP_QUEUE=q_anonymous.meteogroup_weather_warnings.default
     - KAFKA_BROKERS=kafka:9092
     - KAFKA_TOPIC=amqp-messages
     - CERTIFICATE_PATH=certificate-path
+    # reducing mtu size to avoid ssl problems of dockers in dockers on some networks
+    - DOCKER_OPTS="--mtu 1400"
     depends_on: [ init-test-stage ]
   init-test-stage:
     image: nasqueron/rabbitmqadmin
