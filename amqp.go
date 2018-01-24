@@ -54,6 +54,7 @@ func openDeliveryChannel(amqpURI, exchange, queueName, bindingKey, consumerTag, 
 		)
 		logAndPanic(err)
 		queueName = queue.Name
+		logInfo("declared queue", "queue", queue)
 
 		err = consumer.channel.QueueBind(
 			queueName,  // name of the queue
@@ -63,6 +64,7 @@ func openDeliveryChannel(amqpURI, exchange, queueName, bindingKey, consumerTag, 
 			nil,        // arguments
 		)
 		logAndPanic(err)
+		logInfo("bound queue to exchange", "exchange", exchange, "bindingKey", bindingKey)
 	}
 
 	deliveries, err := consumer.channel.Consume(
@@ -75,6 +77,7 @@ func openDeliveryChannel(amqpURI, exchange, queueName, bindingKey, consumerTag, 
 		nil,          // arguments
 	)
 	logAndPanic(err)
+	logInfo("created consumable <-chan Delivery")
 
 	consumer.deliveries = deliveries
 	return

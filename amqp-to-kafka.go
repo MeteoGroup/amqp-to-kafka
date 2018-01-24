@@ -47,6 +47,7 @@ func main() {
 
 	logInfo("lift off")
 	for delivery := range amqpConsumer.deliveries {
+        logInfo("receivedHeaders", "headers", mapHeaders(delivery))
 		forwardToKafka(delivery, kafkaProducer)
 		runtime.GC()
 	}
