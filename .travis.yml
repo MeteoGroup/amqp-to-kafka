@@ -5,6 +5,8 @@ sudo: required
 install:
 - pip install virtualenv
 - pip install requests[security]
+- virtualenv .venv
+- source .venv/bin/activate
 - pip install docker-compose
 - go get -t ./...
 script: travis/build-and-test.sh
