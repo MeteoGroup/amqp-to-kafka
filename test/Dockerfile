@@ -1,6 +1,6 @@
 FROM golang:alpine
 
-RUN apk -U --no-cache add git ca-certificates
+RUN apk -U --no-cache add git ca-certificates build-base
 
 COPY ./ /test/
 
