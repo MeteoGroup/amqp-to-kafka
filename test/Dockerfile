@@ -6,9 +6,6 @@ COPY ./ /test/
 
 RUN adduser -s /bin/nologin -H -D go-test go-test \
  && chown -R go-test:go-test /test
- && pip install virtualenv \
-
-RUN pip install requests[security]
 
 USER go-test
 ENV GOPATH=/test/lib
