@@ -43,8 +43,9 @@ via environment variables as well
   - `KAFKA_BROKERS`: list of Kafka brokers used for bootstrapping
   - `KAFKA_TOPIC`: Kafka topic for outgoing messages
   - `METRICS_ADDRESS`: Listening address to serve metrics
+  - `CERTIFICATE_PATH`: Certificate path to connect with TLS in case of need
 
-When both are specified, commandline parameters take
+The default connection with amqp is not applying TLS but if secure connection is required, then certificate path can be provided as environment variable to be used by service. When both are specified, commandline parameters take
 precedence over environment variables.
 
 Either `amqp-queue` or `amqp-exchange` and `amqp-binding-key` may be specified.

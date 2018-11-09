@@ -14,6 +14,7 @@ services:
     - AMQP_CONSUMER_TAG=my-tag
     - KAFKA_BROKERS=kafka:9092
     - KAFKA_TOPIC=amqp-messages
+    - CERTIFICATE_PATH=certificate-path
     depends_on: [ init-test-stage ]
   init-test-stage:
     image: nasqueron/rabbitmqadmin
