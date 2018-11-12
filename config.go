@@ -56,9 +56,9 @@ func loadConfig() {
 	if kafkaTopic == "" {
 		panic("Required parameter `kafka-topic` is missing or empty.")
 	}
-	if amqpQueue != "" && (amqpBindingKey != "" || amqpExchange != "") {
-		panic("AMQP queue cannot be specified together with AMQP binding key or AMQP exchange")
-	}
+	//if amqpQueue != "" && (amqpBindingKey != "" || amqpExchange != "") {
+	//	panic("AMQP queue cannot be specified together with AMQP binding key or AMQP exchange")
+	//}
 
 	logConfig()
 }
