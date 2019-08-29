@@ -1,2 +1,4 @@
 amqp-to-kafka
 amqp-to-kafka-*
+/.idea
+/lib
